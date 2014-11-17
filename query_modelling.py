@@ -115,7 +115,7 @@ class QueryModeller(object):
 
     """
     def __init__(self, corpus=None, weights={}, top_n=25, 
-                 decay_base=0.81, decay_scale=(1.0 / 360)):
+                 decay_base=0.81, decay_scale=(1.0 / 60)):
         self.corpus = self.set_corpus(corpus)
         self.weights = weights
         self.decay_base = decay_base
@@ -145,9 +145,7 @@ class QueryModeller(object):
             query_terms = [["%s:%s^%f" % (field, term, weight*field_weight) for (term, weight) in
                             weighted_terms if (weight*field_weight > 0)]
                             for (field, field_weight) in self.weights["field"].iteritems()]
-            return " ".join(" ".join(q) for q in query_terms)
-        
-            
+            return " ".join(" ".join(q) for q in query_terms)            
 
     def get_top_n(self, weighted_terms):
         return sorted(weighted_terms.items(),

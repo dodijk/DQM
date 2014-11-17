@@ -10,10 +10,10 @@ weights:
     anchor_idf: 0.12
     anchor_ridf: 0.00
     anchor_tf: -0.02
-    field:
-        description: 0.75
-        keywords: 0.57
-        title: 0.31
+#    field:
+#        description: 0.75
+#        keywords: 0.57
+#        title: 0.31
     is_capitalized: 0.20
     log_anchor_df: 0.08
     log_anchor_idf: 0.09
