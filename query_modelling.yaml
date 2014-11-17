@@ -1,0 +1,7 @@
+flask:
+  # Keep SERVER_NAME and APP_HOST/APP_PORT in sync or Flask will get
+  # confused...
+  #SERVER_NAME: "0.0.0.0:5050"
+  APP_HOST: "0.0.0.0"
+  APP_PORT: 5050
+  DEBUG: True
