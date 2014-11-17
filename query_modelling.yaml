@@ -5,3 +5,29 @@ flask:
   APP_HOST: "0.0.0.0"
   APP_PORT: 5050
   DEBUG: True
+weights:
+    anchor_df: 0.07
+    anchor_idf: 0.12
+    anchor_ridf: 0.00
+    anchor_tf: -0.02
+    field:
+        description: 0.75
+        keywords: 0.57
+        title: 0.31
+    is_capitalized: 0.20
+    log_anchor_df: 0.08
+    log_anchor_idf: 0.09
+    log_anchor_ridf: 0.11
+    log_anchor_tf: 0.01
+    log_is_capitalized: 0.21
+    log_pos_first: -0.05
+    log_pos_last: -0.05
+    log_text_df: -0.07
+    log_text_idf: 0.21
+    pos_first: -0.05
+    pos_last: -0.05
+    terms.num_pow25: 1.50
+    text_df: -0.09
+    text_idf: 0.12
+    title_df: 0.02
+    title_idf: 0.09

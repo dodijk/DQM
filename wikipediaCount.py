@@ -62,6 +62,11 @@ app = Flask("Flask")
 @app.route("/")
 def wikipedia_count_usage():
     return("Usage: /<query> for count.")
+    
+def feature_transform((feature, value)):
+    new_features = []
+    new_features += ("log_"+feature, log(value) if value > 0 else 0.0)
+    return new_features
 
 @app.route("/<query>")
 def wikipedia_count(query):
@@ -73,8 +78,19 @@ def wikipedia_count(query):
     cnts["text_idf"] = log(float(article_count)/cnts["text_df"]) if cnts["text_df"] else 0.0
     if cnts["text_tf"] == 0: cnts["text_ridf"] = 0.0
     else: cnts["text_ridf"] = cnts["text_idf"] - log(1/(exp(float(cnts["text_tf"])/article_count)-1))
-    #return json.dumps(cnts)
+    cnts.update(map(feature_transform, cnts.iteritems()))
+    #return json.dumps(cnts)    
     return cnts
+    
+def feature_ranges():
+    ranges = {}
+    for term in counts.keys():
+        for f, v in wikipedia_count(term).iteritems():
+            if f not in ranges:
+                ranges[f] = v, v
+            else:
+                ranges[f] = min(ranges[f][0], v),  max(ranges[f][1], v)
+    return ranges
 
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False)

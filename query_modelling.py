@@ -74,22 +74,32 @@ import yaml
 
 from nltk import wordpunct_tokenize
 
-from wikipediaCount import wikipedia_count
+from wikipediaCount import wikipedia_count, feature_ranges
 
 class Corpus(object):
     """Small helper class to hold corpus specific information (read:
     word counts).
 
     """
+    def __init__(self):
+        self.ranges = feature_ranges()
+        
     def __getitem__(self, key):
         return self.idf(key)
+                    
+    def feature_normalize(self, (feature, value)):
+        feature_range = self.ranges[feature][1] - self.ranges[feature][0]
+        if feature_range:
+            new_value = (value - self.ranges[feature][0])/feature_range
+        else: new_value = 0.0
+        return feature, new_value
 
-    def idf(self, term):
-        """Return the corpus IDF for the `term`."""
+    def score(self, term, weights):
+        """Return the score for the `term`."""
         cnts = wikipedia_count(term)
-        print cnts
-        return cnts["text_idf"]
-
+        cnts.update(map(self.feature_normalize, cnts.iteritems()))
+        score = sum(v*weights[f] for f, v in cnts.iteritems() if f in weights)
+        return score
 
 class QueryModeller(object):
     """Provides two methods to separate the chaff from the wheat in search
@@ -103,9 +113,10 @@ class QueryModeller(object):
     weighted query in the same format as reformulate(query).
 
     """
-    def __init__(self, corpus=None, top_n=25, decay_base=0.81,
-                 decay_scale=(1.0 / 3600)):
+    def __init__(self, corpus=None, weights={}, top_n=25, 
+                 decay_base=0.81, decay_scale=(1.0 / 360)):
         self.corpus = self.set_corpus(corpus)
+        self.weights = weights
         self.decay_base = decay_base
         self.decay_scale = decay_scale
         self.top_n = top_n
@@ -124,8 +135,16 @@ class QueryModeller(object):
         return imap(self.weighted_term, self.tokenize(query))
 
     def terms_to_query(self, weighted_terms):
-        return " ".join("%s^%f" % (term, weight) for (term, weight) in
-                        weighted_terms if weight > 0)
+        if "field" not in self.weights:
+            return " ".join("%s^%f" % (term, weight) for (term, weight) in
+                            weighted_terms if weight > 0)
+        else:
+            query_terms = [["%s:%s^%f" % (field, term, weight*field_weight) for (term, weight) in
+                            weighted_terms if (weight*field_weight > 0)]
+                            for (field, field_weight) in self.weights["field"].iteritems()]
+            return " ".join(" ".join(q) for q in query_terms)
+        
+            
 
     def get_top_n(self, weighted_terms):
         return sorted(weighted_terms.items(),
@@ -166,7 +185,7 @@ class QueryModeller(object):
         corpus.
 
         """
-        return self.corpus.idf(term)
+        return self.corpus.score(term, self.weights)
 
 
 app = Flask(__name__)
@@ -235,6 +254,7 @@ def main():
     logging.info('loading corpus data')
     corpus = Corpus()
     QM.set_corpus(corpus)
+    QM.weights = config["weights"]
 
     logging.info('starting server')
     app.run(app.config.get('APP_HOST'), \
