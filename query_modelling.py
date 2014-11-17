@@ -177,7 +177,8 @@ class QueryModeller(object):
             decay = self._decay(query_dt, most_recent_dt)
 
             for term, weight in self.weighted_terms(query):
-                query_terms[term] += weight * decay
+                #query_terms[term] += weight * decay
+                query_terms[term] = max(weight * decay, query_terms[term])
 
         return self.terms_to_query(self.get_top_n(query_terms))
 
