@@ -125,7 +125,7 @@ class QueryModeller(object):
 
     def terms_to_query(self, weighted_terms):
         return " ".join("%s^%f" % (term, weight) for (term, weight) in
-                        weighted_terms)
+                        weighted_terms if weight > 0)
 
     def get_top_n(self, weighted_terms):
         return sorted(weighted_terms.items(),
