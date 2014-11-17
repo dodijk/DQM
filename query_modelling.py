@@ -214,14 +214,6 @@ def query_modelling():
 
     return jsonify(weighted_query=QM.model(query))
 
-@app.route('/query_modelling/<session>', methods=["GET"])
-def query_modelling_with_session(session):
-    data = {"query": ""}
-    data["datetime"] = now().isoformat()
-    sessions[session].append(data)
-
-    return jsonify(weighted_query=QM.model(sessions[session]))
-
 @app.route('/query_modelling/<session>', methods=["POST"])
 def query_modelling_with_session(session):
     data = _get_data()
