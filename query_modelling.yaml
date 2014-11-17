@@ -19,7 +19,6 @@ weights:
     log_anchor_idf: 0.09
     log_anchor_ridf: 0.11
     log_anchor_tf: 0.01
-    log_is_capitalized: 0.21
     log_pos_first: -0.05
     log_pos_last: -0.05
     log_text_df: -0.07

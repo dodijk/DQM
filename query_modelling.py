@@ -96,10 +96,11 @@ class Corpus(object):
 
     def score(self, term, weights):
         """Return the score for the `term`."""
-        cnts = wikipedia_count(term)
+        cnts = wikipedia_count(term.lower())
         cnts.update(map(self.feature_normalize, cnts.iteritems()))
+        cnts["is_capitalized"] = term != term.lower()
         score = sum(v*weights[f] for f, v in cnts.iteritems() if f in weights)
-        return score
+        return term.lower(), score
 
 class QueryModeller(object):
     """Provides two methods to separate the chaff from the wheat in search
@@ -120,19 +121,19 @@ class QueryModeller(object):
         self.decay_base = decay_base
         self.decay_scale = decay_scale
         self.top_n = top_n
+        self.skip_terms = (',', '.', '...', "'", '"', '-', '!', ':', 
+                           '(', ')', '?', '*', '%', "':", '\\')
+
 
     def set_corpus(self, corpus):
         self.corpus = corpus
 
     def tokenize(self, string):
         #return string.split()
-        return wordpunct_tokenize(string.lower())
-
-    def weighted_term(self, term):
-        return (term, self.weigh(term))
+        return [term for term in wordpunct_tokenize(string) if term not in self.skip_terms]
 
     def weighted_terms(self, query):
-        return imap(self.weighted_term, self.tokenize(query))
+        return imap(self.weigh, self.tokenize(query))
 
     def terms_to_query(self, weighted_terms):
         if "field" not in self.weights:
