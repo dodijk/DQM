@@ -71,7 +71,8 @@ def wikipedia_count(query):
     if cnts["anchor_tf"] == 0: cnts["anchor_ridf"] = 0.0
     else: cnts["anchor_ridf"] = cnts["anchor_idf"] - log(1/(exp(float(cnts["anchor_tf"])/article_count)-1))
     cnts["text_idf"] = log(float(article_count)/cnts["text_df"]) if cnts["text_df"] else 0.0
-    cnts["text_ridf"] = cnts["text_idf"] - log(1/(exp(float(cnts["text_tf"])/article_count)-1))
+    if cnts["text_tf"] == 0: cnts["text_ridf"] = 0.0
+    else: cnts["text_ridf"] = cnts["text_idf"] - log(1/(exp(float(cnts["text_tf"])/article_count)-1))
     #return json.dumps(cnts)
     return cnts
 
