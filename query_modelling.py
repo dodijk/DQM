@@ -130,7 +130,9 @@ class QueryModeller(object):
 
     def tokenize(self, string):
         #return string.split()
-        return [term for term in wordpunct_tokenize(string) if term not in self.skip_terms]
+        if len(string) == 0: return []
+        tokens = wordpunct_tokenize(string[0].lower() + string[1:])
+        return [term for term in tokens if term not in self.skip_terms]
 
     def weighted_terms(self, query):
         return imap(self.weigh, self.tokenize(query))
