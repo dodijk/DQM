@@ -74,5 +74,6 @@ def wikipedia_count(query):
     cnts["text_ridf"] = cnts["text_idf"] - log(1/(exp(float(cnts["text_tf"])/article_count)-1))
     return json.dumps(cnts)
 
-app.run(debug=True, use_reloader=False)
+if __name__ == "__main__":
+    app.run(debug=True, use_reloader=False)
 
